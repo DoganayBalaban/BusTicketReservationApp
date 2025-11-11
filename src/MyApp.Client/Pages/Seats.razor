@@ -1,0 +1,181 @@
+﻿@page "/trips/{id}/seats"
+@inject NavigationManager Nav
+@inject TripService TripService
+@inject ReservationService ReservationService
+
+@if (isLoading)
+{
+    <p>Sefer yükleniyor...</p>
+}
+else if (trip is null)
+{
+    <div class="error-message">
+        <p>Sefer bulunamadı veya yüklenirken bir hata oluştu.</p>
+        <button class="btn btn-secondary" @onclick="GoBack">Geri Dön</button>
+    </div>
+}
+else
+{
+    <div class="trip-info">
+        <h3>@trip.Company — @trip.DepartureCity → @trip.ArrivalCity</h3>
+        <p>Kalkış: @trip.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+        <p>Otobüs Tipi: @trip.BusType | Toplam Koltuk: @trip.Seats</p>
+    </div>
+
+    <SeatMap Rows="@rows" 
+             Cols="@cols" 
+             TotalSeats="@trip.Seats" 
+             OccupiedSeats="@occupiedSeats"
+             SelectedSeats="@selectedSeats" 
+             OnSeatsChanged="OnSeatsChanged" />
+
+    <BookingSummary SelectedSeats="@selectedSeats" Price="@trip.Price" />
+
+    <div class="action-buttons">
+        <button class="btn btn-secondary" @onclick="GoBack">Geri</button>
+        <button class="btn btn-primary" disabled="@(!selectedSeats.Any())" @onclick="GoCheckout">
+            Devam Et (@selectedSeats.Count koltuk)
+        </button>
+    </div>
+}
+
+<style>
+    .trip-info {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .trip-info h3 {
+        margin: 0 0 0.5rem 0;
+        color: #212529;
+    }
+
+    .trip-info p {
+        margin: 0.25rem 0;
+        color: #6c757d;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .error-message {
+        text-align: center;
+        padding: 2rem;
+        color: #dc3545;
+    }
+
+    .error-message p {
+        margin-bottom: 1rem;
+    }
+</style>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+    private TripDto? trip;
+    private List<string> selectedSeats = new();
+    private List<string> occupiedSeats = new();
+    private int rows = 9;
+    private int cols = 4;
+    private bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        selectedSeats = new List<string>(); // Reset selections when trip changes
+        
+        if (string.IsNullOrEmpty(Id))
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            trip = await TripService.GetTripByIdAsync(Id);
+            
+            if (trip is not null)
+            {
+                // Otobüs tipine göre sütun sayısını belirle
+                if (trip.BusType == "2+1")
+                {
+                    cols = 3;
+                    rows = (int)Math.Ceiling(trip.Seats / 3.0);
+                }
+                else
+                {
+                    cols = 4;
+                    rows = (int)Math.Ceiling(trip.Seats / 4.0);
+                }
+
+                // Dolu koltukları yükle
+                occupiedSeats = await ReservationService.GetOccupiedSeatsAsync(Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading trip: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OnSeatsChanged(List<string> seats)
+    {
+        selectedSeats = seats;
+        StateHasChanged();
+    }
+
+    private void GoCheckout()
+    {
+        if (selectedSeats.Any() && trip is not null)
+        {
+            var seatsParam = string.Join(",", selectedSeats);
+            Nav.NavigateTo($"/checkout?tripId={trip.Id}&seats={seatsParam}");
+        }
+    }
+
+    private void GoBack()
+    {
+        Nav.NavigateTo("/trips");
+    }
+}

@@ -1,0 +1,266 @@
+﻿@page "/"
+@page "/trips"
+@inject TripService TripService
+@inject NavigationManager Nav
+
+<div class="trips-page">
+    <h3>Otobüs Seferleri</h3>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>Kalkış Şehri</label>
+            <input type="text" placeholder="Örn: İstanbul" @bind="departureCity" @bind:event="oninput" />
+        </div>
+        <div class="filter-group">
+            <label>Varış Şehri</label>
+            <input type="text" placeholder="Örn: Ankara" @bind="arrivalCity" @bind:event="oninput" />
+        </div>
+        <div class="filter-group">
+            <label>Tarih</label>
+            <input type="date" @bind="travelDate" @bind:event="onchange" />
+        </div>
+        <div class="filter-group">
+            <button class="btn btn-primary" @onclick="Search">Ara</button>
+            <button class="btn btn-secondary" @onclick="ClearFilters">Temizle</button>
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <p>Seferler yükleniyor...</p>
+    }
+    else if (filtered is { Count: > 0 })
+    {
+        <div class="trips-list">
+            @foreach (var t in filtered)
+            {
+                <div class="trip-card">
+                    <div class="trip-header">
+                        <h4>@t.Company</h4>
+                        <span class="price">@t.Price.ToString("N2") ₺</span>
+                    </div>
+                    <div class="trip-details">
+                        <div class="route">
+                            <span class="city">@t.DepartureCity</span>
+                            <span class="arrow">→</span>
+                            <span class="city">@t.ArrivalCity</span>
+                        </div>
+                        <div class="time">
+                            <span>Kalkış: @t.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        <div class="bus-info">
+                            <span>Otobüs Tipi: @t.BusType</span>
+                            <span>Toplam Koltuk: @t.Seats</span>
+                        </div>
+                    </div>
+                    <div class="trip-actions">
+                        <button class="btn btn-primary" @onclick="@(() => NavigateToSeats(t.Id))">Koltuk Seç</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (filtered is not null && !isLoading)
+    {
+        <div class="no-results">
+            <p>Sonuç bulunamadı. Lütfen farklı kriterler deneyin.</p>
+        </div>
+    }
+</div>
+
+<style>
+    .trips-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .trips-page h3 {
+        margin-bottom: 1.5rem;
+        color: #212529;
+    }
+
+    .filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-group label {
+        font-weight: bold;
+        color: #212529;
+    }
+
+    .filter-group input {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    .trips-list {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .trip-card {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: box-shadow 0.2s;
+    }
+
+    .trip-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .trip-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #007bff;
+    }
+
+    .trip-header h4 {
+        margin: 0;
+        color: #212529;
+    }
+
+    .price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .trip-details {
+        margin-bottom: 1rem;
+    }
+
+    .route {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .city {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #212529;
+    }
+
+    .arrow {
+        color: #6c757d;
+        font-size: 1.5rem;
+    }
+
+    .time {
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    .bus-info {
+        display: flex;
+        gap: 1rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .trip-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+</style>
+
+@code {
+    private List<TripDto>? all;
+    private List<TripDto>? filtered;
+    private string? departureCity;
+    private string? arrivalCity;
+    private DateTime? travelDate;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        all = await TripService.GetTripsAsync();
+        filtered = all;
+        isLoading = false;
+    }
+
+    private void Search()
+    {
+        if (all is null) return;
+
+        filtered = all
+            .Where(t =>
+                (string.IsNullOrWhiteSpace(departureCity) || t.DepartureCity.Contains(departureCity, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(arrivalCity) || t.ArrivalCity.Contains(arrivalCity, StringComparison.OrdinalIgnoreCase)) &&
+                (!travelDate.HasValue || t.DepartureTime.Date == travelDate.Value.Date))
+            .ToList();
+
+        StateHasChanged();
+    }
+
+    private void ClearFilters()
+    {
+        departureCity = null;
+        arrivalCity = null;
+        travelDate = null;
+        filtered = all;
+        StateHasChanged();
+    }
+
+    private void NavigateToSeats(string tripId)
+    {
+        Nav.NavigateTo($"/trips/{tripId}/seats");
+    }
+}

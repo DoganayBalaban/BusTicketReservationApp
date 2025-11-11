@@ -1,0 +1,157 @@
+﻿@using System.ComponentModel.DataAnnotations
+
+<EditForm Model="@model" OnValidSubmit="@Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="firstName">Ad <span class="required">*</span></label>
+        <InputText id="firstName" @bind-Value="model.FirstName" class="form-control" placeholder="Adınız" />
+        <ValidationMessage For="@(() => model.FirstName)" />
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Soyad <span class="required">*</span></label>
+        <InputText id="lastName" @bind-Value="model.LastName" class="form-control" placeholder="Soyadınız" />
+        <ValidationMessage For="@(() => model.LastName)" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">E-posta <span class="required">*</span></label>
+        <InputText id="email" type="email" @bind-Value="model.Email" class="form-control" placeholder="ornek@email.com" />
+        <ValidationMessage For="@(() => model.Email)" />
+    </div>
+
+    <div class="form-group">
+        <label for="tcKimlik">TC Kimlik No <span class="required">*</span></label>
+        <InputText id="tcKimlik" @bind-Value="model.TCKimlik" class="form-control" placeholder="11 haneli TC Kimlik No" maxlength="11" />
+        <ValidationMessage For="@(() => model.TCKimlik)" />
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Telefon <span class="required">*</span></label>
+        <InputText id="phone" @bind-Value="model.Phone" class="form-control" placeholder="05XX XXX XX XX" />
+        <ValidationMessage For="@(() => model.Phone)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+        @if (isSubmitting)
+        {
+            <span>İşleniyor...</span>
+        }
+        else
+        {
+            <span>Rezervasyonu Onayla</span>
+        }
+    </button>
+</EditForm>
+
+<style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+
+    .required {
+        color: red;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .validation-summary {
+        color: #dc3545;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+    }
+
+    .validation-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+@code {
+    public class Passenger
+    {
+        [Required(ErrorMessage = "Ad gereklidir")]
+        [StringLength(50, ErrorMessage = "Ad en fazla 50 karakter olabilir")]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Soyad gereklidir")]
+        [StringLength(50, ErrorMessage = "Soyad en fazla 50 karakter olabilir")]
+        public string LastName { get; set; } = "";
+
+        [Required(ErrorMessage = "E-posta gereklidir")]
+        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "TC Kimlik No gereklidir")]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "TC Kimlik No 11 haneli olmalıdır")]
+        public string TCKimlik { get; set; } = "";
+
+        [Required(ErrorMessage = "Telefon gereklidir")]
+        [RegularExpression(@"^05\d{9}$", ErrorMessage = "Telefon numarası 05XX XXX XX XX formatında olmalıdır")]
+        public string Phone { get; set; } = "";
+    }
+
+    [Parameter] public EventCallback<Passenger> OnSubmitValid { get; set; }
+    private Passenger model = new();
+    private bool isSubmitting = false;
+
+    private async Task Submit()
+    {
+        isSubmitting = true;
+        try
+        {
+            await OnSubmitValid.InvokeAsync(model);
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

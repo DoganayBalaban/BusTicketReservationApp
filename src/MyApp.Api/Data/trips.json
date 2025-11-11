@@ -1,0 +1,32 @@
+﻿[
+  {
+    "id": "1",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-10-25T09:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "2",
+    "company": "Metro Turizm",
+    "departureCity": "İzmir",
+    "arrivalCity": "Bursa",
+    "departureTime": "2025-10-25T14:30:00",
+    "price": 380,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "3",
+    "company": "Pamukkale",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-10-25T17:00:00",
+    "price": 470,
+    "busType": "2+1",
+    "seats": 36
+  }
+]

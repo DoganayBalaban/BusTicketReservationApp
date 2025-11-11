@@ -1,54 +1,44 @@
+using MyApp.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS ayarları
-builder.Services.AddCors(options =>
+builder.Services.AddSingleton<TripRepository>();
+builder.Services.AddSingleton<ReservationRepository>();
+
+const string allowClient = "_allowClient";
+builder.Services.AddCors(o =>
 {
-    options.AddPolicy("AllowBlazor", policy =>
-    {
-        policy.WithOrigins("http://localhost:5000", "http://localhost:5085", "https://localhost:5001")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    o.AddPolicy(allowClient, p =>
+        p.WithOrigins("http://localhost:5085", "https://localhost:7223", "http://localhost:5000", "https://localhost:5000") // Blazor portları
+         .AllowAnyHeader()
+         .AllowAnyMethod());
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseCors("AllowBlazor");
+app.UseCors(allowClient);
 
-var summaries = new[]
+// Ana route için bilgi sayfası
+app.MapGet("/", () => Results.Json(new
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    message = "Otobüs Bileti Rezervasyon API'si",
+    version = "1.0",
+    endpoints = new
+    {
+        swagger = "/swagger",
+        trips = "/api/trips",
+        reservations = "/api/reservations"
+    }
+}));
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

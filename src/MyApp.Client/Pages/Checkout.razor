@@ -1,0 +1,175 @@
+﻿@page "/checkout"
+@inject NavigationManager Nav
+@inject TripService TripService
+@inject ReservationService ReservationService
+@inject LocalStorageService LocalStorage
+
+@if (trip is null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <div class="checkout-container">
+        <h3>Rezervasyon Bilgileri</h3>
+
+        <div class="trip-summary">
+            <h4>Sefer Bilgileri</h4>
+            <p><strong>Firma:</strong> @trip.Company</p>
+            <p><strong>Güzergah:</strong> @trip.DepartureCity → @trip.ArrivalCity</p>
+            <p><strong>Kalkış:</strong> @trip.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+            <p><strong>Seçilen Koltuklar:</strong> @string.Join(", ", selectedSeats)</p>
+            <p><strong>Toplam Tutar:</strong> @((selectedSeats.Count * trip.Price).ToString("N2")) ₺</p>
+        </div>
+
+        <div class="passenger-form-container">
+            <h4>Yolcu Bilgileri</h4>
+            <PassengerForm OnSubmitValid="OnSubmitValid" />
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+<style>
+    .checkout-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .checkout-container h3 {
+        margin-bottom: 1.5rem;
+        color: #212529;
+    }
+
+    .trip-summary {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .trip-summary h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+    .trip-summary p {
+        margin: 0.5rem 0;
+        color: #6c757d;
+    }
+
+    .trip-summary p strong {
+        color: #212529;
+    }
+
+    .passenger-form-container {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .passenger-form-container h4 {
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: #212529;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+</style>
+
+@code {
+    private TripDto? trip;
+    private List<string> selectedSeats = new();
+    private string? errorMessage;
+    private bool isProcessing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = new Uri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        var tripId = query.GetValueOrDefault("tripId").ToString();
+        var seatsParam = query.GetValueOrDefault("seats").ToString();
+
+        if (string.IsNullOrWhiteSpace(tripId) || string.IsNullOrWhiteSpace(seatsParam))
+        {
+            errorMessage = "Geçersiz rezervasyon bilgileri.";
+            return;
+        }
+
+        trip = await TripService.GetTripByIdAsync(tripId);
+        if (trip is null)
+        {
+            errorMessage = "Sefer bulunamadı.";
+            return;
+        }
+
+        selectedSeats = seatsParam.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+        if (!selectedSeats.Any())
+        {
+            errorMessage = "Koltuk seçimi yapılmamış.";
+        }
+    }
+
+    private async Task OnSubmitValid(PassengerForm.Passenger passenger)
+    {
+        if (trip is null || !selectedSeats.Any() || isProcessing) return;
+
+        isProcessing = true;
+        errorMessage = null;
+
+        try
+        {
+            var reservation = new ReservationDto
+            {
+                TripId = trip.Id,
+                Seats = selectedSeats,
+                PassengerName = passenger.FirstName,
+                PassengerSurname = passenger.LastName,
+                Email = passenger.Email,
+                TCKimlik = passenger.TCKimlik,
+                Phone = passenger.Phone
+            };
+
+            var createdReservation = await ReservationService.CreateReservationAsync(reservation);
+
+            if (createdReservation is null)
+            {
+                errorMessage = "Rezervasyon oluşturulurken bir hata oluştu.";
+                isProcessing = false;
+                return;
+            }
+
+            // localStorage'a kaydet
+            await LocalStorage.SetItem("lastReservation", createdReservation);
+
+            // Rezervasyon onay sayfasına yönlendir
+            Nav.NavigateTo($"/reservation-confirmation?code={createdReservation.ReservationCode}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Hata: {ex.Message}";
+            isProcessing = false;
+        }
+    }
+}

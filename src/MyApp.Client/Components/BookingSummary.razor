@@ -1,0 +1,88 @@
+﻿@if (SelectedSeats?.Any() == true)
+{
+    <div class="booking-summary">
+        <h4>Rezervasyon Özeti</h4>
+        <div class="summary-item">
+            <span class="label">Seçilen Koltuklar:</span>
+            <span class="value">@string.Join(", ", SelectedSeats)</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Koltuk Sayısı:</span>
+            <span class="value">@SelectedSeats.Count adet</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Birim Fiyat:</span>
+            <span class="value">@Price.ToString("N2") ₺</span>
+        </div>
+        <div class="summary-item total">
+            <span class="label">Toplam Tutar:</span>
+            <span class="value">@((SelectedSeats.Count * Price).ToString("N2")) ₺</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="booking-summary empty">
+        <p>Lütfen koltuk seçiniz</p>
+    </div>
+}
+
+<style>
+    .booking-summary {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .booking-summary h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-item.total {
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid #007bff;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .summary-item .label {
+        color: #6c757d;
+    }
+
+    .summary-item .value {
+        font-weight: 500;
+        color: #212529;
+    }
+
+    .summary-item.total .value {
+        color: #007bff;
+    }
+
+    .booking-summary.empty {
+        text-align: center;
+        color: #6c757d;
+        padding: 2rem;
+    }
+</style>
+
+@code {
+    [Parameter] public List<string>? SelectedSeats { get; set; } = new();
+    [Parameter] public decimal Price { get; set; }
+}

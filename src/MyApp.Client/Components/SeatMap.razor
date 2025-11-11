@@ -1,0 +1,185 @@
+﻿<div class="seat-map">
+    <div class="seat-map-info">
+        <span class="seat-legend available">Boş</span>
+        <span class="seat-legend occupied">Dolu</span>
+        <span class="seat-legend selected">Seçili</span>
+    </div>
+    <div class="seat-map-container">
+        @for (int row = 1; row <= Rows; row++)
+        {
+            <div class="seat-row">
+                <span class="row-number">@row</span>
+                @for (int col = 0; col < Cols; col++)
+                {
+                    var seatNumber = (row - 1) * Cols + col + 1;
+                    if (seatNumber > TotalSeats)
+                    {
+                        <span class="seat empty"></span>
+                        continue;
+                    }
+
+                    var seatId = $"{row}{(char)('A' + col)}";
+                    var isOccupied = OccupiedSeats?.Contains(seatId) == true;
+                    var isSelected = SelectedSeats?.Contains(seatId) == true;
+                    var seatClass = isSelected ? "selected" : (isOccupied ? "occupied" : "available");
+
+                    <button class="seat @seatClass"
+                            disabled="@isOccupied"
+                            @onclick="@(() => Toggle(seatId))"
+                            title="@(isOccupied ? "Dolu" : seatId)">
+                        @seatId
+                    </button>
+                }
+                @if (Cols == 3)
+                {
+                    <span class="aisle"></span>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .seat-map {
+        margin: 20px 0;
+    }
+
+    .seat-map-info {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+        justify-content: center;
+    }
+
+    .seat-legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .seat-legend::before {
+        content: '';
+        width: 30px;
+        height: 30px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .seat-legend.available::before {
+        background-color: #fff;
+        border-color: #28a745;
+    }
+
+    .seat-legend.occupied::before {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .seat-legend.selected::before {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .seat-map-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .seat-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .row-number {
+        width: 30px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .seat {
+        width: 50px;
+        height: 50px;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+    }
+
+    .seat.available {
+        border-color: #28a745;
+        color: #28a745;
+    }
+
+    .seat.available:hover:not(:disabled) {
+        background-color: #e8f5e9;
+        transform: scale(1.05);
+    }
+
+    .seat.selected {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+
+    .seat.occupied {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .seat.empty {
+        border: none;
+        background: transparent;
+        cursor: default;
+    }
+
+    .seat:disabled {
+        cursor: not-allowed;
+    }
+
+    .aisle {
+        width: 20px;
+    }
+</style>
+
+@code {
+    [Parameter] public int Rows { get; set; }
+    [Parameter] public int Cols { get; set; }
+    [Parameter] public int TotalSeats { get; set; } = 40;
+    [Parameter] public List<string>? OccupiedSeats { get; set; }
+    [Parameter] public List<string>? SelectedSeats { get; set; } = new();
+    [Parameter] public EventCallback<List<string>> OnSeatsChanged { get; set; }
+
+    private async Task Toggle(string seatId)
+    {
+        // Dolu koltuk seçilemez
+        if (OccupiedSeats?.Contains(seatId) == true)
+            return;
+
+        var currentSelection = new List<string>(SelectedSeats ?? new List<string>());
+        
+        if (currentSelection.Contains(seatId))
+        {
+            currentSelection.Remove(seatId);
+        }
+        else
+        {
+            currentSelection.Add(seatId);
+        }
+
+        if (OnSeatsChanged.HasDelegate)
+        {
+            await OnSeatsChanged.InvokeAsync(currentSelection);
+        }
+    }
+}
