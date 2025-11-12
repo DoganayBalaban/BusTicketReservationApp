@@ -11,6 +11,13 @@
 else
 {
     <div class="checkout-container">
+        @if (completedReservation is null)
+        {
+            <div class="form-actions form-actions-top">
+                <button class="btn btn-secondary" @onclick="GoBackToSeats">← Koltuk Seçimine Dön</button>
+            </div>
+        }
+
         <h3>Rezervasyon Bilgileri</h3>
 
         <div class="trip-summary">
@@ -22,10 +29,13 @@ else
             <p><strong>Toplam Tutar:</strong> @((selectedSeats.Count * trip.Price).ToString("N2")) ₺</p>
         </div>
 
-        <div class="passenger-form-container">
-            <h4>Yolcu Bilgileri</h4>
-            <PassengerForm OnSubmitValid="OnSubmitValid" />
-        </div>
+        @if (completedReservation is null)
+        {
+            <div class="passenger-form-container">
+                <h4>Yolcu Bilgileri</h4>
+                <PassengerForm OnSubmitValid="OnSubmitValid" />
+            </div>
+        }
     </div>
 }
 
@@ -33,6 +43,36 @@ else
 {
     <div class="alert alert-danger">
         @errorMessage
+    </div>
+}
+
+@if (completedReservation is not null)
+{
+    <div class="reservation-summary">
+        <h4>Rezervasyon Özeti</h4>
+        <div class="summary-grid">
+            <div>
+                <h5>Rezervasyon</h5>
+                <p><strong>Kod:</strong> @completedReservation.ReservationCode</p>
+                <p><strong>Bilet Alım Tarihi:</strong> @completedReservation.ReservationDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                
+            </div>
+            <div>
+                <h5>Yolcu</h5>
+                <p><strong>Ad Soyad:</strong> @completedReservation.PassengerName @completedReservation.PassengerSurname</p>
+                <p><strong>E-posta:</strong> @completedReservation.Email</p>
+                <p><strong>Telefon:</strong> @completedReservation.Phone</p>
+                <p><strong>TC Kimlik:</strong> @completedReservation.TCKimlik</p>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">
+        <p>@successMessage</p>
+        <button class="btn btn-primary" @onclick="GoToTrips">Seferlere Geri Dön</button>
     </div>
 }
 
@@ -95,13 +135,86 @@ else
         border: 1px solid #f5c6cb;
         color: #721c24;
     }
+
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .alert-success .btn {
+        align-self: flex-start;
+    }
+
+    .reservation-summary {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .reservation-summary h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+    .summary-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .summary-grid h5 {
+        margin-bottom: 0.75rem;
+        color: #495057;
+    }
+
+    .summary-grid p {
+        margin: 0.4rem 0;
+        color: #6c757d;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+    }
+
+    .form-actions-top {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
 </style>
 
 @code {
     private TripDto? trip;
     private List<string> selectedSeats = new();
     private string? errorMessage;
+    private string? successMessage;
     private bool isProcessing = false;
+    private ReservationDto? completedReservation;
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,6 +241,33 @@ else
         if (!selectedSeats.Any())
         {
             errorMessage = "Koltuk seçimi yapılmamış.";
+            return;
+        }
+
+        await LoadStoredReservationIfExists();
+    }
+
+    private async Task LoadStoredReservationIfExists()
+    {
+        var storedReservation = await LocalStorage.GetItem<ReservationDto>("lastReservation");
+        if (storedReservation is null || trip is null)
+        {
+            return;
+        }
+
+        var seatComparer = StringComparer.OrdinalIgnoreCase;
+        var selectedSet = new HashSet<string>(selectedSeats, seatComparer);
+        var storedSet = new HashSet<string>(storedReservation.Seats, seatComparer);
+
+        if (storedReservation.TripId == trip.Id && selectedSet.SetEquals(storedSet))
+        {
+            completedReservation = storedReservation;
+            selectedSeats = storedReservation.Seats;
+            successMessage = $"Rezervasyonunuz hazır. Rezervasyon kodunuz: {storedReservation.ReservationCode}";
+        }
+        else
+        {
+            await LocalStorage.RemoveItem("lastReservation");
         }
     }
 
@@ -137,6 +277,8 @@ else
 
         isProcessing = true;
         errorMessage = null;
+        successMessage = null;
+        completedReservation = null;
 
         try
         {
@@ -163,13 +305,24 @@ else
             // localStorage'a kaydet
             await LocalStorage.SetItem("lastReservation", createdReservation);
 
-            // Rezervasyon onay sayfasına yönlendir
-            Nav.NavigateTo($"/reservation-confirmation?code={createdReservation.ReservationCode}");
+            completedReservation = createdReservation;
+            selectedSeats = createdReservation.Seats;
+            successMessage = $"Rezervasyonunuz başarıyla oluşturuldu. Rezervasyon kodunuz: {createdReservation.ReservationCode}";
+            isProcessing = false;
         }
         catch (Exception ex)
         {
             errorMessage = $"Hata: {ex.Message}";
             isProcessing = false;
+        }
+    }
+
+    private void GoToTrips() => Nav.NavigateTo("/trips");
+    private void GoBackToSeats()
+    {
+        if (trip is not null)
+        {
+            Nav.NavigateTo($"/trips/{trip.Id}/seats");
         }
     }
 }
