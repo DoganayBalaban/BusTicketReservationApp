@@ -4,7 +4,7 @@
     "company": "Kamil Koç",
     "departureCity": "İstanbul",
     "arrivalCity": "Ankara",
-    "departureTime": "2025-10-25T09:00:00",
+    "departureTime": "2025-11-13T09:00:00",
     "price": 450,
     "busType": "2+1",
     "seats": 36
@@ -14,18 +14,488 @@
     "company": "Metro Turizm",
     "departureCity": "İzmir",
     "arrivalCity": "Bursa",
-    "departureTime": "2025-10-25T14:30:00",
+    "departureTime": "2025-11-13T14:30:00",
     "price": 380,
     "busType": "2+2",
     "seats": 40
   },
   {
     "id": "3",
-    "company": "Pamukkale",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-13T20:00:00",
+    "price": 650,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "4",
+    "company": "Ulusoy",
+    "departureCity": "Ankara",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-13T08:30:00",
+    "price": 420,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "5",
+    "company": "Kamil Koç",
     "departureCity": "İstanbul",
     "arrivalCity": "Ankara",
-    "departureTime": "2025-10-25T17:00:00",
-    "price": 470,
+    "departureTime": "2025-11-13T15:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "6",
+    "company": "Metro Turizm",
+    "departureCity": "Bursa",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-13T22:00:00",
+    "price": 580,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "7",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İzmir",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-13T10:00:00",
+    "price": 400,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "8",
+    "company": "Ulusoy",
+    "departureCity": "Antalya",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-13T19:30:00",
+    "price": 680,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "9",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-14T07:00:00",
+    "price": 420,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "10",
+    "company": "Metro Turizm",
+    "departureCity": "Ankara",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-14T21:00:00",
+    "price": 550,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "11",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Trabzon",
+    "departureTime": "2025-11-14T18:00:00",
+    "price": 720,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "12",
+    "company": "Ulusoy",
+    "departureCity": "İzmir",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-14T09:30:00",
+    "price": 430,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "13",
+    "company": "Kamil Koç",
+    "departureCity": "Ankara",
+    "arrivalCity": "Bursa",
+    "departureTime": "2025-11-14T11:00:00",
+    "price": 380,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "14",
+    "company": "Metro Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Konya",
+    "departureTime": "2025-11-14T13:30:00",
+    "price": 480,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "15",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Antalya",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-14T20:30:00",
+    "price": 570,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "16",
+    "company": "Ulusoy",
+    "departureCity": "Bursa",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-15T08:00:00",
+    "price": 320,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "17",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-15T21:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "18",
+    "company": "Metro Turizm",
+    "departureCity": "Ankara",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-15T10:00:00",
+    "price": 460,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "19",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İzmir",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-15T16:00:00",
+    "price": 590,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "20",
+    "company": "Ulusoy",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Samsun",
+    "departureTime": "2025-11-15T19:00:00",
+    "price": 680,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "21",
+    "company": "Kamil Koç",
+    "departureCity": "Ankara",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-16T07:30:00",
+    "price": 420,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "22",
+    "company": "Metro Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Denizli",
+    "departureTime": "2025-11-16T12:00:00",
+    "price": 520,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "23",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Bursa",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-16T14:30:00",
+    "price": 390,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "24",
+    "company": "Ulusoy",
+    "departureCity": "Antalya",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-16T17:00:00",
+    "price": 540,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "25",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-16T23:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "26",
+    "company": "Metro Turizm",
+    "departureCity": "İzmir",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-17T08:30:00",
+    "price": 440,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "27",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Ankara",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-17T20:00:00",
+    "price": 560,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "28",
+    "company": "Ulusoy",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Bursa",
+    "departureTime": "2025-11-17T11:00:00",
+    "price": 310,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "29",
+    "company": "Kamil Koç",
+    "departureCity": "Trabzon",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-17T15:00:00",
+    "price": 750,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "30",
+    "company": "Metro Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-17T06:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "31",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Konya",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-18T09:00:00",
+    "price": 490,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "32",
+    "company": "Ulusoy",
+    "departureCity": "İzmir",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-18T13:00:00",
+    "price": 410,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "33",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-18T22:30:00",
+    "price": 660,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "34",
+    "company": "Metro Turizm",
+    "departureCity": "Ankara",
+    "arrivalCity": "Bursa",
+    "departureTime": "2025-11-18T10:30:00",
+    "price": 380,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "35",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Antalya",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-18T18:00:00",
+    "price": 670,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "36",
+    "company": "Ulusoy",
+    "departureCity": "Bursa",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-19T07:00:00",
+    "price": 370,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "37",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-19T12:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "38",
+    "company": "Metro Turizm",
+    "departureCity": "Samsun",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-19T16:00:00",
+    "price": 700,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "39",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İzmir",
+    "arrivalCity": "Bursa",
+    "departureTime": "2025-11-19T14:00:00",
+    "price": 380,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "40",
+    "company": "Ulusoy",
+    "departureCity": "Ankara",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-19T19:30:00",
+    "price": 460,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "41",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-20T08:00:00",
+    "price": 420,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "42",
+    "company": "Metro Turizm",
+    "departureCity": "Denizli",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-20T11:00:00",
+    "price": 530,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "43",
+    "company": "Pamukkale Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-20T17:00:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "44",
+    "company": "Ulusoy",
+    "departureCity": "Antalya",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-20T21:00:00",
+    "price": 570,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "45",
+    "company": "Kamil Koç",
+    "departureCity": "Ankara",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-20T09:00:00",
+    "price": 460,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "46",
+    "company": "Metro Turizm",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Trabzon",
+    "departureTime": "2025-11-21T19:00:00",
+    "price": 730,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "47",
+    "company": "Pamukkale Turizm",
+    "departureCity": "Bursa",
+    "arrivalCity": "İstanbul",
+    "departureTime": "2025-11-21T10:00:00",
+    "price": 320,
+    "busType": "2+2",
+    "seats": 40
+  },
+  {
+    "id": "48",
+    "company": "Ulusoy",
+    "departureCity": "İzmir",
+    "arrivalCity": "Antalya",
+    "departureTime": "2025-11-21T15:30:00",
+    "price": 600,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "49",
+    "company": "Kamil Koç",
+    "departureCity": "İstanbul",
+    "arrivalCity": "Ankara",
+    "departureTime": "2025-11-21T23:30:00",
+    "price": 450,
+    "busType": "2+1",
+    "seats": 36
+  },
+  {
+    "id": "50",
+    "company": "Metro Turizm",
+    "departureCity": "Ankara",
+    "arrivalCity": "İzmir",
+    "departureTime": "2025-11-21T07:00:00",
+    "price": 420,
     "busType": "2+1",
     "seats": 36
   }

@@ -2,12 +2,12 @@
 
 public class TripDto
 {
-    public string Id { get; set; } = "";
-    public string Company { get; set; } = "";
-    public string DepartureCity { get; set; } = "";
-    public string ArrivalCity { get; set; } = "";
+    public string Id { get; set; } = string.Empty;
+    public string Company { get; set; } = string.Empty;
+    public string DepartureCity { get; set; } = string.Empty;
+    public string ArrivalCity { get; set; } = string.Empty;
     public DateTime DepartureTime { get; set; }
     public decimal Price { get; set; }
-    public string BusType { get; set; } = "";
+    public string BusType { get; set; } = string.Empty;
     public int Seats { get; set; }
 }

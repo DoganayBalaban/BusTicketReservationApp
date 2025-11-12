@@ -5,21 +5,36 @@ namespace MyApp.Api.Services;
 
 public class TripRepository
 {
-    private readonly IWebHostEnvironment _env;
-    private readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
+    private readonly List<Trip> _trips;
 
-    public TripRepository(IWebHostEnvironment env) => _env = env;
-
-    public async Task<List<Trip>> GetAllAsync()
+    public TripRepository()
     {
-        var path = Path.Combine(_env.ContentRootPath, "Data", "trips.json");
-        if (!File.Exists(path)) return new();
-
-        await using var fs = File.OpenRead(path);
-        var data = await JsonSerializer.DeserializeAsync<List<Trip>>(fs, _json);
-        return data ?? new();
+        var jsonPath = Path.Combine(AppContext.BaseDirectory, "Data", "trips.json");
+        var jsonData = File.ReadAllText(jsonPath);
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        _trips = JsonSerializer.Deserialize<List<Trip>>(jsonData, options) ?? new List<Trip>();
     }
 
-    public async Task<Trip?> GetByIdAsync(string id)
-        => (await GetAllAsync()).FirstOrDefault(t => t.Id == id);
+    public List<Trip> GetAll() => _trips;
+
+    public Trip? GetById(string id) => _trips.FirstOrDefault(t => t.Id == id);
+
+    public List<Trip> Search(string? departureCity = null, string? arrivalCity = null, DateTime? date = null)
+    {
+        var query = _trips.AsQueryable();
+
+        if (!string.IsNullOrEmpty(departureCity))
+            query = query.Where(t => t.DepartureCity.Contains(departureCity, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrEmpty(arrivalCity))
+            query = query.Where(t => t.ArrivalCity.Contains(arrivalCity, StringComparison.OrdinalIgnoreCase));
+
+        if (date.HasValue)
+            query = query.Where(t => t.DepartureTime.Date == date.Value.Date);
+
+        return query.OrderBy(t => t.DepartureTime).ToList();
+    }
 }

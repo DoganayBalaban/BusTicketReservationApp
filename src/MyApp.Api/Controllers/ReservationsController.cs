@@ -8,34 +8,58 @@ namespace MyApp.Api.Controllers;
 [Route("api/[controller]")]
 public class ReservationsController : ControllerBase
 {
-    private readonly ReservationRepository _repo;
-    public ReservationsController(ReservationRepository repo) => _repo = repo;
+    private readonly ReservationRepository _repository;
 
-    [HttpGet("trip/{tripId}/occupied-seats")]
-    public ActionResult<List<string>> GetOccupiedSeats(string tripId)
-        => _repo.GetOccupiedSeats(tripId);
+    public ReservationsController(ReservationRepository repository)
+    {
+        _repository = repository;
+    }
+
+    [HttpGet]
+    public ActionResult<List<Reservation>> GetAll()
+    {
+        return Ok(_repository.GetAll());
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Reservation> GetById(string id)
+    {
+        var reservation = _repository.GetById(id);
+        if (reservation == null)
+            return NotFound();
+
+        return Ok(reservation);
+    }
+
+    [HttpGet("trip/{tripId}")]
+    public ActionResult<List<Reservation>> GetByTripId(string tripId)
+    {
+        return Ok(_repository.GetByTripId(tripId));
+    }
 
     [HttpPost]
-    public ActionResult<Reservation> CreateReservation([FromBody] Reservation reservation)
+    public ActionResult<Reservation> Create(Reservation reservation)
     {
-        // Koltukların dolu olup olmadığını kontrol et
-        var occupiedSeats = _repo.GetOccupiedSeats(reservation.TripId);
-        var conflictingSeats = reservation.Seats.Where(s => occupiedSeats.Contains(s)).ToList();
+        // Id ve ReservationCode oluştur
+        if (string.IsNullOrEmpty(reservation.Id))
+            reservation.Id = Guid.NewGuid().ToString();
         
-        if (conflictingSeats.Any())
-        {
-            return BadRequest(new { message = $"Bu koltuklar zaten rezerve edilmiş: {string.Join(", ", conflictingSeats)}" });
-        }
-
-        var created = _repo.CreateReservation(reservation);
-        return CreatedAtAction(nameof(GetByCode), new { code = created.ReservationCode }, created);
+        if (string.IsNullOrEmpty(reservation.ReservationCode))
+            reservation.ReservationCode = Guid.NewGuid().ToString("N")[..8].ToUpper();
+        
+        reservation.ReservationDate = DateTime.Now;
+        
+        var created = _repository.Add(reservation);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [HttpGet("code/{code}")]
-    public ActionResult<Reservation> GetByCode(string code)
+    [HttpDelete("{id}")]
+    public ActionResult Delete(string id)
     {
-        var reservation = _repo.GetReservationByCode(code);
-        return reservation is null ? NotFound() : reservation;
+        var success = _repository.Delete(id);
+        if (!success)
+            return NotFound();
+
+        return NoContent();
     }
 }
-

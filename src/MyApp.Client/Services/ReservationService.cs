@@ -7,41 +7,79 @@ public class ReservationService
 {
     private readonly HttpClient _http;
 
-    public ReservationService(HttpClient http) => _http = http;
+    public ReservationService(HttpClient http)
+    {
+        _http = http;
+    }
+
+    public async Task<List<ReservationDto>> GetAllReservationsAsync()
+    {
+        try
+        {
+            var reservations = await _http.GetFromJsonAsync<List<ReservationDto>>("api/reservations");
+            return reservations ?? new List<ReservationDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hata: {ex.Message}");
+            return new List<ReservationDto>();
+        }
+    }
+
+    public async Task<List<ReservationDto>> GetReservationsByTripIdAsync(string tripId)
+    {
+        try
+        {
+            var reservations = await _http.GetFromJsonAsync<List<ReservationDto>>($"api/reservations/trip/{tripId}");
+            return reservations ?? new List<ReservationDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hata: {ex.Message}");
+            return new List<ReservationDto>();
+        }
+    }
 
     public async Task<List<string>> GetOccupiedSeatsAsync(string tripId)
     {
         try
         {
-            var result = await _http.GetFromJsonAsync<List<string>>($"api/reservations/trip/{tripId}/occupied-seats");
-            return result ?? new List<string>();
+            var reservations = await GetReservationsByTripIdAsync(tripId);
+            return reservations.SelectMany(r => r.Seats).ToList();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Hata: {ex.Message}");
             return new List<string>();
         }
     }
 
     public async Task<ReservationDto?> CreateReservationAsync(ReservationDto reservation)
     {
-        var response = await _http.PostAsJsonAsync("api/reservations", reservation);
-        if (response.IsSuccessStatusCode)
-        {
-            return await response.Content.ReadFromJsonAsync<ReservationDto>();
-        }
-        return null;
-    }
-
-    public async Task<ReservationDto?> GetReservationByCodeAsync(string code)
-    {
         try
         {
-            return await _http.GetFromJsonAsync<ReservationDto>($"api/reservations/code/{code}");
+            var response = await _http.PostAsJsonAsync("api/reservations", reservation);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<ReservationDto>();
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Hata: {ex.Message}");
             return null;
         }
     }
-}
 
+    public async Task<bool> DeleteReservationAsync(string id)
+    {
+        try
+        {
+            var response = await _http.DeleteAsync($"api/reservations/{id}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Hata: {ex.Message}");
+            return false;
+        }
+    }
+}

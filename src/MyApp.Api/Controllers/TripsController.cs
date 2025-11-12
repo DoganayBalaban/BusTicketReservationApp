@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MyApp.Api.Models;
 using MyApp.Api.Services;
 
@@ -9,16 +8,36 @@ namespace MyApp.Api.Controllers;
 [Route("api/[controller]")]
 public class TripsController : ControllerBase
 {
-    private readonly TripRepository _repo;
-    public TripsController(TripRepository repo) => _repo = repo;
+    private readonly TripRepository _repository;
+
+    public TripsController(TripRepository repository)
+    {
+        _repository = repository;
+    }
 
     [HttpGet]
-    public async Task<ActionResult<List<Trip>>> Get() => await _repo.GetAllAsync();
+    public ActionResult<List<Trip>> GetAll()
+    {
+        return Ok(_repository.GetAll());
+    }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Trip>> GetById(string id)
+    public ActionResult<Trip> GetById(string id)
     {
-        var trip = await _repo.GetByIdAsync(id);
-        return trip is null ? NotFound() : trip;
+        var trip = _repository.GetById(id);
+        if (trip == null)
+            return NotFound();
+
+        return Ok(trip);
+    }
+
+    [HttpGet("search")]
+    public ActionResult<List<Trip>> Search(
+        [FromQuery] string? departureCity,
+        [FromQuery] string? arrivalCity,
+        [FromQuery] DateTime? date)
+    {
+        var results = _repository.Search(departureCity, arrivalCity, date);
+        return Ok(results);
     }
 }
