@@ -6,11 +6,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- API bağımlılıkları: Swagger, PostgreSQL sağlayıcısı ve .env okuma -->
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="DotNetEnv" Version="3.1.1" />
   </ItemGroup>
 
+  <!-- Seed için kullanılan trips.json'ı publish çıktısına kopyala -->
   <ItemGroup>
     <None Update="Data\trips.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -16,15 +16,18 @@ public class TripsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Trip>> GetAll()
+    public async Task<ActionResult<List<Trip>>> GetAll()
     {
-        return Ok(_repository.GetAll());
+        // Present trips ordered by departure time for predictable UI listing
+        var trips = await _repository.GetAllAsync();
+        return Ok(trips);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Trip> GetById(string id)
+    public async Task<ActionResult<Trip>> GetById(string id)
     {
-        var trip = _repository.GetById(id);
+        // Early return 404 to avoid null payloads
+        var trip = await _repository.GetByIdAsync(id);
         if (trip == null)
             return NotFound();
 
@@ -32,12 +35,13 @@ public class TripsController : ControllerBase
     }
 
     [HttpGet("search")]
-    public ActionResult<List<Trip>> Search(
+    public async Task<ActionResult<List<Trip>>> Search(
         [FromQuery] string? departureCity,
         [FromQuery] string? arrivalCity,
         [FromQuery] DateTime? date)
     {
-        var results = _repository.Search(departureCity, arrivalCity, date);
+        // Search with optional filters; repository normalizes date to UTC
+        var results = await _repository.SearchAsync(departureCity, arrivalCity, date);
         return Ok(results);
     }
 }

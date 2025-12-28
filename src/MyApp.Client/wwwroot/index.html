@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="MyApp.Client.styles.css" rel="stylesheet" />
+    <script>
+        // Environment variable'dan API URL'ini al (varsa)
+        window.apiBaseUrl = window.location.origin.includes('localhost') 
+            ? (localStorage.getItem('API_BASE_URL') || 'http://localhost:5001/')
+            : (window.location.origin + '/');
+    </script>
 </head>
 
 <body>

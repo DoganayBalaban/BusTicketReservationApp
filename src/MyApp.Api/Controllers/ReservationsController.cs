@@ -16,15 +16,18 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Reservation>> GetAll()
+    public async Task<ActionResult<List<Reservation>>> GetAll()
     {
-        return Ok(_repository.GetAll());
+        // Return latest reservations so the newest bookings are shown first
+        var reservations = await _repository.GetAllAsync();
+        return Ok(reservations);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Reservation> GetById(string id)
+    public async Task<ActionResult<Reservation>> GetById(string id)
     {
-        var reservation = _repository.GetById(id);
+        // Short-circuit with 404 if the reservation does not exist
+        var reservation = await _repository.GetByIdAsync(id);
         if (reservation == null)
             return NotFound();
 
@@ -32,31 +35,26 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpGet("trip/{tripId}")]
-    public ActionResult<List<Reservation>> GetByTripId(string tripId)
+    public async Task<ActionResult<List<Reservation>>> GetByTripId(string tripId)
     {
-        return Ok(_repository.GetByTripId(tripId));
+        // Limit results to a specific trip to simplify seat management
+        var reservations = await _repository.GetByTripIdAsync(tripId);
+        return Ok(reservations);
     }
 
     [HttpPost]
-    public ActionResult<Reservation> Create(Reservation reservation)
+    public async Task<ActionResult<Reservation>> Create(Reservation reservation)
     {
-        // Id ve ReservationCode oluştur
-        if (string.IsNullOrEmpty(reservation.Id))
-            reservation.Id = Guid.NewGuid().ToString();
-        
-        if (string.IsNullOrEmpty(reservation.ReservationCode))
-            reservation.ReservationCode = Guid.NewGuid().ToString("N")[..8].ToUpper();
-        
-        reservation.ReservationDate = DateTime.Now;
-        
-        var created = _repository.Add(reservation);
+        // Repository handles id/code generation and UTC normalization
+        var created = await _repository.AddAsync(reservation);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpDelete("{id}")]
-    public ActionResult Delete(string id)
+    public async Task<ActionResult> Delete(string id)
     {
-        var success = _repository.Delete(id);
+        // Avoid silent failures; respond with 404 when nothing is removed
+        var success = await _repository.DeleteAsync(id);
         if (!success)
             return NotFound();
 
